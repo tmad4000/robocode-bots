@@ -161,11 +161,14 @@ public class PatternMatch extends AdvancedRobot
 				
 				}
 				
-				System.out.println(bestScoreI);
+				System.out.println(bestScoreI + " score: " + bestScore);
 				
-				enemyLastMatchingWindow = Arrays.copyOfRange(past, bestScoreI, bestScoreI+windowSize); 
+				enemyLastMatchingWindow = Arrays.copyOfRange(past, bestScoreI, Math.min(past.length,bestScoreI+windowSize-1)); 
                                 enemyPatternProjNextStates = Arrays.copyOfRange(past, 0, bestScoreI);
+
                                 
+                                    System.out.println("dhead " + enemy.dHead);
+
                                 Enemy currEnemy = enemy.clone();
                                 
                                 //0 is futuremost
@@ -268,6 +271,7 @@ public class PatternMatch extends AdvancedRobot
 		g.setColor(java.awt.Color.RED);
 		int i=0;
 		for (Enemy pastEnemy: enemyPrevStates) {
+                   
 					if(i<windowSize)
 						g.setColor(java.awt.Color.YELLOW);
 					else
@@ -278,14 +282,18 @@ public class PatternMatch extends AdvancedRobot
 			}
 			
 		for(Enemy futureEnemy: enemyLastMatchingWindow) { 
+                     if(futureEnemy==null) {
+                        System.out.println("null futureEnemy");
+                        continue;
+                    }
 			g.setColor(java.awt.Color.GREEN);
 			g.drawOval( (int) futureEnemy.x, (int) futureEnemy.y, 10, 10);
 		}		
                 
-//		for(Enemy futureEnemy: enemyPatternProjNextStates) { 
-//			g.setColor(java.awt.Color.ORANGE);
-//			g.drawOval( (int) futureEnemy.x, (int) futureEnemy.y, 10, 10);
-//		}
+		for(Enemy futureEnemy: enemyPatternProjNextStates) { 
+			g.setColor(java.awt.Color.ORANGE);
+			g.drawOval( (int) futureEnemy.x, (int) futureEnemy.y, 10, 10);
+		}
 		
 	}	
 
@@ -442,7 +450,7 @@ class Enemy extends Point2D.Double {
 	double absbear,dist,head,v;
 	AdvancedRobot myBot;
 	
-	double dHead, dv;
+	double dHead;
 	
 	
 	public Enemy(AdvancedRobot bot) {
@@ -468,7 +476,7 @@ class Enemy extends Point2D.Double {
 		dHead=e.getHeadingRadians()-head;
 		head=e.getHeadingRadians();
 		
-		dHead=e.getVelocity()-v;
+		
 		v=e.getVelocity();
 		
 		x=myBot.getX()+Math.sin(absbear)*dist;
@@ -504,6 +512,8 @@ class Enemy extends Point2D.Double {
 		stamp.dist=dist;
 		stamp.head=head;
 		stamp.v=v;
+                
+                stamp.dHead=dHead;
 		
 		return stamp;
 	}
@@ -518,15 +528,19 @@ class Enemy extends Point2D.Double {
             
             
                 x+=v*Math.sin(head);
-                
                 y+=v*Math.cos(head);
                 
                 
                 head+=diff.dHead;
-                v+=diff.dv;
+                dHead=diff.dHead;
+                
+                v=diff.v;
                 
                 dist=this.distance(myBot.getX(), myBot.getY());
                 absbear=Math.atan2(x-myBot.getX(), y-myBot.getY());
+                
+                
+                
                 
         }
 
