@@ -39,7 +39,10 @@ public class PatternMatch extends AdvancedRobot
 	int windowSize = 100;	
 	LinkedList<Enemy> enemyPrevStates = new LinkedList<Enemy>();
 	
+        
+	Enemy[] afterEnemyLastMatchingWindow = new Enemy[0];
 	Enemy[] enemyPatternProjNextStates = new Enemy[0];
+        
 	
 	Enemy[] enemyLastMatchingWindow = new Enemy[0];	
 
@@ -154,7 +157,7 @@ public class PatternMatch extends AdvancedRobot
 						score += last7[j].diffScore(past[i+j]);
 					}
 					
-					if(score>bestScore) {
+					if(score>=bestScore) {
 						bestScore=score;
 						bestScoreI=i;
 					}
@@ -164,7 +167,8 @@ public class PatternMatch extends AdvancedRobot
 				System.out.println(bestScoreI + " score: " + bestScore);
 				
 				enemyLastMatchingWindow = Arrays.copyOfRange(past, bestScoreI, Math.min(past.length,bestScoreI+windowSize-1)); 
-                                enemyPatternProjNextStates = Arrays.copyOfRange(past, 0, bestScoreI);
+                                afterEnemyLastMatchingWindow = Arrays.copyOfRange(past, 0, bestScoreI);
+                                enemyPatternProjNextStates = afterEnemyLastMatchingWindow.clone(); 
 
                                 
                                     System.out.println("dhead " + enemy.dHead);
@@ -278,6 +282,8 @@ public class PatternMatch extends AdvancedRobot
 						g.setColor(java.awt.Color.RED);
                                         
 					g.drawOval( (int) pastEnemy.x,(int) pastEnemy.y,10,10);
+                                        g.drawLine((int)pastEnemy.x,(int)pastEnemy.y, (int)(pastEnemy.x+ 20*Math.sin(pastEnemy.head)), (int)(pastEnemy.y+ 20*Math.cos(pastEnemy.head)));
+
 					i++;
 			}
 			
@@ -290,9 +296,22 @@ public class PatternMatch extends AdvancedRobot
 			g.drawOval( (int) futureEnemy.x, (int) futureEnemy.y, 10, 10);
 		}		
                 
+                
+                        
+		for(Enemy futureEnemy: afterEnemyLastMatchingWindow) { 
+			g.setColor(java.awt.Color.PINK);
+			g.drawOval( (int) futureEnemy.x, (int) futureEnemy.y, 10, 10);
+                        
+                        g.drawLine((int)futureEnemy.x,(int)futureEnemy.y, (int)(futureEnemy.x+ 20*Math.sin(futureEnemy.head)), (int)(futureEnemy.y+ 20*Math.cos(futureEnemy.head)));
+
+		}          
+                
 		for(Enemy futureEnemy: enemyPatternProjNextStates) { 
 			g.setColor(java.awt.Color.ORANGE);
 			g.drawOval( (int) futureEnemy.x, (int) futureEnemy.y, 10, 10);
+                        
+                        g.drawLine((int)futureEnemy.x,(int)futureEnemy.y, (int)(futureEnemy.x+ 20*Math.sin(futureEnemy.head)), (int)(futureEnemy.y+ 20*Math.cos(futureEnemy.head)));
+
 		}
 		
 	}	
@@ -500,6 +519,7 @@ class Enemy extends Point2D.Double {
 	public void paint(Graphics2D g) {
 		g.setColor(java.awt.Color.RED);
 		g.drawRect((int)(x-getWidth()/2),  (int)(((y-getHeight()/2))), (int)(getWidth()),  (int)(getHeight()));
+                g.drawLine((int)x,(int)y, (int)(x+ 50*Math.sin(head)), (int)(y+ 50*Math.cos(head)));
 		
 	}	
 	
