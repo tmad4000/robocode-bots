@@ -36,7 +36,7 @@ public class PatternMatch extends AdvancedRobot
 	Enemy enemy=new Enemy(this);
 	
 	
-	int windowSize = 100;	
+	int windowSize = 7;	
 	LinkedList<Enemy> enemyPrevStates = new LinkedList<Enemy>();
 	
         
@@ -142,7 +142,7 @@ public class PatternMatch extends AdvancedRobot
 			if(enemyPrevStates.size()>=windowSize) {
 				
 				
-				Enemy[] last7 = enemyPrevStates.subList(0,windowSize).toArray(new Enemy[0]);
+				Enemy[] lastWindow = enemyPrevStates.subList(0,windowSize).toArray(new Enemy[0]);
 				Enemy[] past = enemyPrevStates.toArray(new Enemy[0]);
 				
 				
@@ -152,12 +152,12 @@ public class PatternMatch extends AdvancedRobot
 				for(int i=windowSize;i<past.length-windowSize;i++) {
 					
 					double score = 0;
-					//comp last 7 to appropriate window
+					//comp last window to past
 					for(int j=0;j<windowSize; j++) {
-						score += last7[j].diffScore(past[i+j]);
+						score += lastWindow[j].diffScore(past[i+j]);
 					}
 					
-					if(score>=bestScore) {
+					if(score>bestScore) {
 						bestScore=score;
 						bestScoreI=i;
 					}
@@ -173,7 +173,7 @@ public class PatternMatch extends AdvancedRobot
                                 
                                     System.out.println("dhead " + enemy.dHead);
 
-                                Enemy currEnemy = enemy.clone();
+                                Enemy currEnemy = lastWindow[0].clone();
                                 
                                 //0 is futuremost
                                 for(int i=enemyPatternProjNextStates.length-1;i>=0;i--) {
@@ -287,34 +287,56 @@ public class PatternMatch extends AdvancedRobot
 					i++;
 			}
 			
-		for(Enemy futureEnemy: enemyLastMatchingWindow) { 
-                     if(futureEnemy==null) {
-                        System.out.println("null futureEnemy");
+		for(Enemy pastEnemy: enemyLastMatchingWindow) { 
+                     if(pastEnemy==null) {
+                        System.out.println("null pastEnemy");
                         continue;
                     }
 			g.setColor(java.awt.Color.GREEN);
-			g.drawOval( (int) futureEnemy.x, (int) futureEnemy.y, 10, 10);
+			g.drawOval( (int) pastEnemy.x, (int) pastEnemy.y, 10, 10);
 		}		
                 
+                g.setColor(java.awt.Color.WHITE);
+
+                Enemy currEnemyInPattern = enemyLastMatchingWindow[0];
+                currEnemyInPattern.paintColored(g,java.awt.Color.WHITE);
+                g.drawLine((int)currEnemyInPattern.x,(int)currEnemyInPattern.y, (int)(currEnemyInPattern.x+ 40*Math.sin(currEnemyInPattern.head)), (int)(currEnemyInPattern.y+ 40*Math.cos(currEnemyInPattern.head)));
+//              
                 
                         
-		for(Enemy futureEnemy: afterEnemyLastMatchingWindow) { 
-			g.setColor(java.awt.Color.PINK);
-			g.drawOval( (int) futureEnemy.x, (int) futureEnemy.y, 10, 10);
-                        
-                        g.drawLine((int)futureEnemy.x,(int)futureEnemy.y, (int)(futureEnemy.x+ 20*Math.sin(futureEnemy.head)), (int)(futureEnemy.y+ 20*Math.cos(futureEnemy.head)));
-
-		}          
+//		for(Enemy futureEnemy: afterEnemyLastMatchingWindow) { 
+//			g.setColor(java.awt.Color.PINK);
+//			g.drawOval((int) futureEnemy.x, (int) futureEnemy.y, 10, 10);
+//                        
+//                        g.drawLine((int)futureEnemy.x,(int)futureEnemy.y, (int)(futureEnemy.x+ 20*Math.sin(futureEnemy.head)), (int)(futureEnemy.y+ 20*Math.cos(futureEnemy.head)));
+//
+//		}          
                 
-		for(Enemy futureEnemy: enemyPatternProjNextStates) { 
-			g.setColor(java.awt.Color.ORANGE);
-			g.drawOval( (int) futureEnemy.x, (int) futureEnemy.y, 10, 10);
-                        
-                        g.drawLine((int)futureEnemy.x,(int)futureEnemy.y, (int)(futureEnemy.x+ 20*Math.sin(futureEnemy.head)), (int)(futureEnemy.y+ 20*Math.cos(futureEnemy.head)));
+                g.setColor(java.awt.Color.CYAN);
 
-		}
+                Enemy nextTurnEnemyInPattern = afterEnemyLastMatchingWindow[afterEnemyLastMatchingWindow.length-1];
+                g.drawLine((int)nextTurnEnemyInPattern.x,(int)nextTurnEnemyInPattern.y, (int)(nextTurnEnemyInPattern.x+ 40*Math.sin(nextTurnEnemyInPattern.head)), (int)(nextTurnEnemyInPattern.y+ 40*Math.cos(nextTurnEnemyInPattern.head)));
+
+//                g.drawLine((int)nextTurnEnemyInPattern.x,(int)nextTurnEnemyInPattern.y, (int)(nextTurnEnemyInPattern.x+ 10*nextTurnEnemyInPattern.v*Math.sin(nextTurnEnemyInPattern.head)), (int)(nextTurnEnemyInPattern.y+ 10*nextTurnEnemyInPattern.v*Math.cos(nextTurnEnemyInPattern.head)));
+
 		
-	}	
+                
+//		for(Enemy futureEnemy: enemyPatternProjNextStates) { 
+//			g.setColor(java.awt.Color.ORANGE);
+//			g.drawOval( (int) futureEnemy.x, (int) futureEnemy.y, 10, 10);
+//                        
+//                        g.drawLine((int)futureEnemy.x,(int)futureEnemy.y, (int)(futureEnemy.x+ 20*Math.sin(futureEnemy.head)), (int)(futureEnemy.y+ 20*Math.cos(futureEnemy.head)));
+//
+//		}
+//                
+                g.setColor(java.awt.Color.CYAN);
+
+
+                Enemy nextTurnEnemy = enemyPatternProjNextStates[enemyPatternProjNextStates.length-1];
+                
+                g.drawLine((int)nextTurnEnemy.x,(int)nextTurnEnemy.y, (int)(nextTurnEnemy.x+ 40*Math.sin(nextTurnEnemy.head)), (int)(nextTurnEnemy.y+ 40*Math.cos(currEnemyInPattern.head)));
+
+        }	
 
 /*	int bucket(double gf) {
 		return (int)Math.round(gf*numBuckets.length);
@@ -517,7 +539,12 @@ class Enemy extends Point2D.Double {
 	}
 	*/
 	public void paint(Graphics2D g) {
-		g.setColor(java.awt.Color.RED);
+		this.paintColored(g, java.awt.Color.RED);
+		
+	}	
+	
+	public void paintColored(Graphics2D g, java.awt.Color c) {
+		g.setColor(c);
 		g.drawRect((int)(x-getWidth()/2),  (int)(((y-getHeight()/2))), (int)(getWidth()),  (int)(getHeight()));
                 g.drawLine((int)x,(int)y, (int)(x+ 50*Math.sin(head)), (int)(y+ 50*Math.cos(head)));
 		
@@ -539,7 +566,10 @@ class Enemy extends Point2D.Double {
 	}
 	
 	public double diffScore(Enemy e) {
-		return Math.abs(v-e.v) + Math.abs(dHead-e.dHead);
+		return Math.abs(dHead-e.dHead);
+//                return Math.abs(v-e.v);
+
+//		return Math.abs(v-e.v) + Math.abs(dHead-e.dHead);
 	}
         
         
